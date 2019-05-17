@@ -9,11 +9,15 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
+use yii\widgets\Pjax;
 use common\models\LoginForm;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use frontend\models\EntryForm;
+use frontend\models\LinkLogs;
+
 
 /**
  * Site controller
@@ -74,7 +78,26 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $formModel = new EntryForm();
+
+        Pjax::begin();
+        if ($formModel->load(Yii::$app->request->post()) && $formModel->validate()) {
+            // данные в $model удачно проверены
+
+            $formModel->setUrlStructure($formModel->link);
+
+            $linkModel = new LinkLogs();
+            $linkModel->link = $formModel->link;
+            $linkModel->time = date("Y-m-d H:i:s");
+            $linkModel->save();
+
+
+            return $this->render('entry-confirm', ['model' => $formModel]);
+        } else {
+            // либо страница отображается первый раз, либо есть ошибка в данных
+            return $this->render('entry', ['model' => $formModel]);
+        }
+        Pjax::end();
     }
 
     /**
@@ -256,5 +279,10 @@ class SiteController extends Controller
         return $this->render('resendVerificationEmail', [
             'model' => $model
         ]);
+    }
+
+    public function actionEntry()
+    {
+
     }
 }

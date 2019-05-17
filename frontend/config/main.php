@@ -9,7 +9,7 @@ $params = array_merge(
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'gii'],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [
@@ -36,6 +36,7 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'db'  => require(__DIR__ . '/db.php'),
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,
@@ -46,4 +47,12 @@ return [
         */
     ],
     'params' => $params,
+    'modules' => [
+        'gii' => [
+            'class' => 'yii\gii\Module',
+            'allowedIPs' => ['*'],
+        ],
+    ],
 ];
+
+
